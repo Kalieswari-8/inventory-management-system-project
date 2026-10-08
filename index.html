@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventory Management System</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f7fb;
+    color: #1f2937;
+}
+
+/* SIDEBAR */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 240px;
+    height: 100vh;
+    background: #0d47a1;
+    color: white;
+    padding: 20px;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.sidebar button {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: white;
+    text-align: left;
+    padding: 13px 15px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.sidebar button:hover,
+.sidebar button.active {
+    background: #1565c0;
+}
+
+/* MAIN */
+.main {
+    margin-left: 240px;
+    padding: 25px;
+}
+
+.header {
+    background: white;
+    padding: 18px 22px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.header h1 {
+    font-size: 24px;
+}
+
+.date {
+    color: #6b7280;
+}
+
+/* SECTIONS */
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+/* DASHBOARD CARDS */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.card h3 {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.card p {
+    font-size: 28px;
+    font-weight: bold;
+    color: #0d47a1;
+}
+
+/* CONTENT BOX */
+.box {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+.box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.box-header h2 {
+    color: #1f2937;
+}
+
+/* BUTTON */
+.btn {
+    border: none;
+    padding: 10px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background: #0d47a1;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1565c0;
+}
+
+.btn-edit {
+    background: #f59e0b;
+    color: white;
+    margin-right: 5px;
+}
+
+.btn-delete {
+    background: #dc2626;
+    color: white;
+}
+
+/* SEARCH */
+.search {
+    padding: 10px;
+    width: 250px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+}
+
+/* TABLE */
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 13px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+    background: #f8fafc;
+    color: #374151;
+}
+
+tr:hover {
+    background: #f8fafc;
+}
+
+/* STATUS */
+.status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.in-stock {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.low-stock {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* FORM */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+    padding: 11px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background: white;
+    width: 500px;
+    max-width: 90%;
+    padding: 25px;
+    border-radius: 12px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.close {
+    font-size: 25px;
+    cursor: pointer;
+    color: #6b7280;
+}
+
+.modal-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* REPORT */
+.report-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.report-card {
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+}
+
+.report-card h3 {
+    margin-bottom: 10px;
+}
+
+/* MOBILE */
+@media(max-width: 900px) {
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .report-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width: 700px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .main {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+    <div class="logo">
+        📦 Inventory System
+    </div>
+
+    <button class="nav-btn active" onclick="showSection('dashboard', this)">
+        🏠 Dashboard
+    </button>
+
+    <button class="nav-btn" onclick="showSection('products', this)">
+        📦 Products
+    </button>
+
+    <button class="nav-btn" onclick="showSection('categories', this)">
+        🗂 Categories
+    </button>
+
+    <button class="nav-btn" onclick="showSection('suppliers', this)">
+        🚚 Suppliers
+    </button>
+
+    <button class="nav-btn" onclick="showSection('transactions', this)">
+        🔄 Stock Transactions
+    </button>
+
+    <button class="nav-btn" onclick="showSection('reports', this)">
+        📊 Reports
+    </button>
+
+</div>
+
+
+<!-- MAIN -->
+<div class="main">
+
+    <div class="header">
+        <h1 id="pageTitle">Dashboard</h1>
+        <div class="date" id="currentDate"></div>
+    </div>
+
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="section active">
+
+        <div class="cards">
+
+            <div class="card">
+                <h3>Total Products</h3>
+                <p id="totalProducts">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Total Categories</h3>
+                <p id="totalCategories">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Total Suppliers</h3>
+                <p id="totalSuppliers">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Low Stock</h3>
+                <p id="lowStock">0</p>
+            </div>
+
+        </div>
+
+
+        <div class="box">
+
+            <div class="box-header">
+                <h2>Recent Products</h2>
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="dashboardProducts"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- PRODUCTS -->
+    <section id="products" class="section">
+
+        <div class="box">
+
+            <div class="box-header">
+
+                <h2>Products</h2>
+
+                <div>
+                    <input
+                        type="text"
+                        id="searchProduct"
+                        class="search"
+                        placeholder="Search product..."
+                        onkeyup="searchProducts()"
+                    >
+
+                    <button class="btn btn-primary" onclick="openAddModal()">
+                        + Add Product
+                    </button>
+                </div>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Supplier</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Reorder Level</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="productTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CATEGORIES -->
+    <section id="categories" class="section">
+
+        <div class="box">
+
+            <div class="box-header">
+                <h2>Categories</h2>
+
+                <button class="btn btn-primary" onclick="addCategory()">
+                    + Add Category
+                </button>
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Category Name</th>
+                            <th>Product Count</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="categoryTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- SUPPLIERS -->
+    <section id="suppliers" class="section">
+
+        <div class="box">
+
+            <div class="box-header">
+
+                <h2>Suppliers</h2>
+
+                <button class="btn btn-primary" onclick="addSupplier()">
+                    + Add Supplier
+                </button>
+
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Supplier Name</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="supplierTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- TRANSACTIONS -->
+    <section id="transactions" class="section">
+
+        <div class="box">
+
+            <div class="box-header">
+                <h2>Stock Transactions</h2>
+
+                <button class="btn btn-primary" onclick="addTransaction()">
+                    + Add Transaction
+                </button>
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Product</th>
+                            <th>Type</th>
+                            <th>Quantity</th>
+                            <th>Date</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="transactionTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- REPORTS -->
+    <section id="reports" class="section">
+
+        <div class="box">
+
+            <div class="box-header">
+                <h2>Inventory Reports</h2>
+            </div>
+
+            <div class="report-grid">
+
+                <div class="report-card">
+                    <h3>Total Products</h3>
+                    <p id="reportProducts">0</p>
+                </div>
+
+                <div class="report-card">
+                    <h3>Total Stock Quantity</h3>
+                    <p id="reportStock">0</p>
+                </div>
+
+                <div class="report-card">
+                    <h3>Low Stock Products</h3>
+                    <p id="reportLowStock">0</p>
+                </div>
+
+                <div class="report-card">
+                    <h3>Total Inventory Value</h3>
+                    <p id="reportValue">₹0</p>
+                </div>
+
+                <div class="report-card">
+                    <h3>Total Categories</h3>
+                    <p id="reportCategories">0</p>
+                </div>
+
+                <div class="report-card">
+                    <h3>Total Suppliers</h3>
+                    <p id="reportSuppliers">0</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal" id="productModal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2 id="modalTitle">Add Product</h2>
+
+            <span class="close" onclick="closeModal()">×</span>
+
+        </div>
+
+
+        <form id="productForm">
+
+            <input type="hidden" id="editId">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>Product Name</label>
+
+                    <input
+                        type="text"
+                        id="productName"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Category</label>
+
+                    <select id="productCategory" required>
+
+                        <option value="Electronics">
+                            Electronics
+                        </option>
+
+                        <option value="Stationery">
+                            Stationery
+                        </option>
+
+                        <option value="Grocery">
+                            Grocery
+                        </option>
+
+                        <option value="Furniture">
+                            Furniture
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Supplier</label>
+
+                    <input
+                        type="text"
+                        id="productSupplier"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Price</label>
+
+                    <input
+                        type="number"
+                        id="productPrice"
+                        min="0"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Stock Quantity</label>
+
+                    <input
+                        type="number"
+                        id="productStock"
+                        min="0"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Reorder Level</label>
+
+                    <input
+                        type="number"
+                        id="reorderLevel"
+                        min="0"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn"
+                    onclick="closeModal()"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Save Product
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* ================================
+   DEFAULT DATA
+================================ */
+
+let products = JSON.parse(
+    localStorage.getItem("inventoryProducts")
+) || [
+
+    {
+        id: 1,
+        name: "Laptop",
+        category: "Electronics",
+        supplier: "ABC Electronics",
+        price: 55000,
+        stock: 3,
+        reorder: 5
+    },
+
+    {
+        id: 2,
+        name: "Wireless Mouse",
+        category: "Electronics",
+        supplier: "ABC Electronics",
+        price: 850,
+        stock: 50,
+        reorder: 10
+    },
+
+    {
+        id: 3,
+        name: "Notebook",
+        category: "Stationery",
+        supplier: "Office Supplies",
+        price: 80,
+        stock: 100,
+        reorder: 20
+    },
+
+    {
+        id: 4,
+        name: "Pen",
+        category: "Stationery",
+        supplier: "Office Supplies",
+        price: 20,
+        stock: 200,
+        reorder: 30
+    },
+
+    {
+        id: 5,
+        name: "Rice Bag",
+        category: "Grocery",
+        supplier: "Fresh Foods",
+        price: 1200,
+        stock: 15,
+        reorder: 20
+    }
+
+];
+
+
+let categories = [
+    "Electronics",
+    "Stationery",
+    "Grocery",
+    "Furniture"
+];
+
+
+let suppliers = [
+    {
+        id: 1,
+        name: "ABC Electronics",
+        phone: "9876543210",
+        email: "abc@gmail.com"
+    },
+
+    {
+        id: 2,
+        name: "Office Supplies",
+        phone: "9876543211",
+        email: "office@gmail.com"
+    },
+
+    {
+        id: 3,
+        name: "Fresh Foods",
+        phone: "9876543212",
+        email: "fresh@gmail.com"
+    }
+];
+
+
+let transactions = [
+    {
+        id: 1,
+        product: "Laptop",
+        type: "STOCK IN",
+        quantity: 10,
+        date: "08-10-2026"
+    },
+
+    {
+        id: 2,
+        product: "Wireless Mouse",
+        type: "STOCK OUT",
+        quantity: 5,
+        date: "08-10-2026"
+    }
+];
+
+
+/* ================================
+   SAVE DATA
+================================ */
+
+function saveData() {
+
+    localStorage.setItem(
+        "inventoryProducts",
+        JSON.stringify(products)
+    );
+
+}
+
+
+/* ================================
+   NAVIGATION
+================================ */
+
+function showSection(sectionId, button) {
+
+    document
+        .querySelectorAll(".section")
+        .forEach(section => {
+            section.classList.remove("active");
+        });
+
+
+    document
+        .getElementById(sectionId)
+        .classList.add("active");
+
+
+    document
+        .querySelectorAll(".nav-btn")
+        .forEach(btn => {
+            btn.classList.remove("active");
+        });
+
+
+    button.classList.add("active");
+
+
+    let titles = {
+
+        dashboard: "Dashboard",
+
+        products: "Products",
+
+        categories: "Categories",
+
+        suppliers: "Suppliers",
+
+        transactions: "Stock Transactions",
+
+        reports: "Reports"
+
+    };
+
+
+    document.getElementById("pageTitle").textContent =
+        titles[sectionId];
+
+}
+
+
+/* ================================
+   DISPLAY PRODUCTS
+================================ */
+
+function displayProducts() {
+
+    let table =
+        document.getElementById("productTable");
+
+    table.innerHTML = "";
+
+
+    products.forEach(product => {
+
+        let status =
+            product.stock <= product.reorder
+                ? `<span class="status low-stock">Low Stock</span>`
+                : `<span class="status in-stock">In Stock</span>`;
+
+
+        table.innerHTML += `
+
+            <tr>
+
+                <td>${product.id}</td>
+
+                <td>${product.name}</td>
+
+                <td>${product.category}</td>
+
+                <td>${product.supplier}</td>
+
+                <td>₹${Number(product.price).toLocaleString()}</td>
+
+                <td>${product.stock}</td>
+
+                <td>${product.reorder}</td>
+
+                <td>${status}</td>
+
+                <td>
+
+                    <button
+                        class="btn btn-edit"
+                        onclick="editProduct(${product.id})"
+                    >
+                        Edit
+                    </button>
+
+                    <button
+                        class="btn btn-delete"
+                        onclick="deleteProduct(${product.id})"
+                    >
+                        Delete
+                    </button>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+
+    displayDashboardProducts();
+
+    updateDashboard();
+
+    displayCategories();
+
+    displayReports();
+
+}
+
+
+/* ================================
+   DASHBOARD PRODUCTS
+================================ */
+
+function displayDashboardProducts() {
+
+    let table =
+        document.getElementById("dashboardProducts");
+
+    table.innerHTML = "";
+
+
+    products.slice(0, 5).forEach(product => {
+
+        let status =
+            product.stock <= product.reorder
+                ? `<span class="status low-stock">Low Stock</span>`
+                : `<span class="status in-stock">In Stock</span>`;
+
+
+        table.innerHTML += `
+
+            <tr>
+
+                <td>${product.id}</td>
+
+                <td>${product.name}</td>
+
+                <td>${product.category}</td>
+
+                <td>₹${Number(product.price).toLocaleString()}</td>
+
+                <td>${product.stock}</td>
+
+                <td>${status}</td>
+
+            </tr>
+
+        `;
+
+    });
+
+}
+
+
+/* ================================
+   DASHBOARD
+================================ */
+
+function updateDashboard() {
+
+    document.getElementById("totalProducts").textContent =
+        products.length;
+
+
+    document.getElementById("totalCategories").textContent =
+        categories.length;
+
+
+    document.getElementById("totalSuppliers").textContent =
+        suppliers.length;
+
+
+    let lowStockProducts =
+        products.filter(
+            product => product.stock <= product.reorder
+        );
+
+
+    document.getElementById("lowStock").textContent =
+        lowStockProducts.length;
+
+}
+
+
+/* ================================
+   OPEN ADD MODAL
+================================ */
+
+function openAddModal() {
+
+    document.getElementById("modalTitle").textContent =
+        "Add Product";
+
+
+    document.getElementById("editId").value = "";
+
+
+    document.getElementById("productForm").reset();
+
+
+    document.getElementById("productModal").style.display =
+        "flex";
+
+}
+
+
+/* ================================
+   CLOSE MODAL
+================================ */
+
+function closeModal() {
+
+    document.getElementById("productModal").style.display =
+        "none";
+
+}
+
+
+/* ================================
+   ADD / EDIT PRODUCT
+================================ */
+
+document
+    .getElementById("productForm")
+    .addEventListener("submit", function(event) {
+
+        event.preventDefault();
+
+
+        let editId =
+            document.getElementById("editId").value;
+
+
+        let productData = {
+
+            name:
+                document.getElementById("productName").value,
+
+            category:
+                document.getElementById("productCategory").value,
+
+            supplier:
+                document.getElementById("productSupplier").value,
+
+            price:
+                Number(document.getElementById("productPrice").value),
+
+            stock:
+                Number(document.getElementById("productStock").value),
+
+            reorder:
+                Number(document.getElementById("reorderLevel").value)
+
+        };
+
+
+        if (editId) {
+
+            let index =
+                products.findIndex(
+                    product => product.id == editId
+                );
+
+
+            if (index !== -1) {
+
+                products[index] = {
+
+                    id: Number(editId),
+
+                    ...productData
+
+                };
+
+            }
+
+            alert("Product updated successfully!");
+
+        }
+
+        else {
+
+            let newId =
+                products.length > 0
+                    ? Math.max(...products.map(p => p.id)) + 1
+                    : 1;
+
+
+            products.push({
+
+                id: newId,
+
+                ...productData
+
+            });
+
+
+            alert("Product added successfully!");
+
+        }
+
+
+        saveData();
+
+        closeModal();
+
+        displayProducts();
+
+    });
+
+
+/* ================================
+   EDIT PRODUCT
+================================ */
+
+function editProduct(id) {
+
+    let product =
+        products.find(
+            product => product.id === id
+        );
+
+
+    if (!product) return;
+
+
+    document.getElementById("modalTitle").textContent =
+        "Edit Product";
+
+
+    document.getElementById("editId").value =
+        product.id;
+
+
+    document.getElementById("productName").value =
+        product.name;
+
+
+    document.getElementById("productCategory").value =
+        product.category;
+
+
+    document.getElementById("productSupplier").value =
+        product.supplier;
+
+
+    document.getElementById("productPrice").value =
+        product.price;
+
+
+    document.getElementById("productStock").value =
+        product.stock;
+
+
+    document.getElementById("reorderLevel").value =
+        product.reorder;
+
+
+    document.getElementById("productModal").style.display =
+        "flex";
+
+}
+
+
+/* ================================
+   DELETE PRODUCT
+================================ */
+
+function deleteProduct(id) {
+
+    let product =
+        products.find(
+            product => product.id === id
+        );
+
+
+    if (!product) return;
+
+
+    let confirmDelete =
+        confirm(
+            "Are you sure you want to delete " +
+            product.name +
+            "?"
+        );
+
+
+    if (!confirmDelete) return;
+
+
+    products =
+        products.filter(
+            product => product.id !== id
+        );
+
+
+    saveData();
+
+    displayProducts();
+
+    alert("Product deleted successfully!");
+
+}
+
+
+/* ================================
+   SEARCH PRODUCTS
+================================ */
+
+function searchProducts() {
+
+    let search =
+        document
+            .getElementById("searchProduct")
+            .value
+            .toLowerCase();
+
+
+    let rows =
+        document.querySelectorAll(
+            "#productTable tr"
+        );
+
+
+    rows.forEach(row => {
+
+        let text =
+            row.textContent.toLowerCase();
+
+
+        row.style.display =
+            text.includes(search)
+                ? ""
+                : "none";
+
+    });
+
+}
+
+
+/* ================================
+   CATEGORIES
+================================ */
+
+function displayCategories() {
+
+    let table =
+        document.getElementById("categoryTable");
+
+    table.innerHTML = "";
+
+
+    categories.forEach((category, index) => {
+
+        let count =
+            products.filter(
+                product =>
+                    product.category === category
+            ).length;
+
+
+        table.innerHTML += `
+
+            <tr>
+
+                <td>${index + 1}</td>
+
+                <td>${category}</td>
+
+                <td>${count}</td>
+
+            </tr>
+
+        `;
+
+    });
+
+}
+
+
+/* ================================
+   ADD CATEGORY
+================================ */
+
+function addCategory() {
+
+    let name =
+        prompt("Enter category name:");
+
+
+    if (!name) return;
+
+
+    name = name.trim();
+
+
+    if (
+        categories.some(
+            category =>
+                category.toLowerCase() ===
+                name.toLowerCase()
+        )
+    ) {
+
+        alert("Category already exists!");
+
+        return;
+
+    }
+
+
+    categories.push(name);
+
+    displayCategories();
+
+    updateDashboard();
+
+    alert("Category added successfully!");
+
+}
+
+
+/* ================================
+   SUPPLIERS
+================================ */
+
+function displaySuppliers() {
+
+    let table =
+        document.getElementById("supplierTable");
+
+    table.innerHTML = "";
+
+
+    suppliers.forEach(supplier => {
+
+        table.innerHTML += `
+
+            <tr>
+
+                <td>${supplier.id}</td>
+
+                <td>${supplier.name}</td>
+
+                <td>${supplier.phone}</td>
+
+                <td>${supplier.email}</td>
+
+            </tr>
+
+        `;
+
+    });
+
+}
+
+
+/* ================================
+   ADD SUPPLIER
+================================ */
+
+function addSupplier() {
+
+    let name =
+        prompt("Enter supplier name:");
+
+    if (!name) return;
+
+
+    let phone =
+        prompt("Enter phone number:");
+
+    if (!phone) return;
+
+
+    let email =
+        prompt("Enter email:");
+
+    if (!email) return;
+
+
+    let newId =
+        suppliers.length > 0
+            ? Math.max(...suppliers.map(s => s.id)) + 1
+            : 1;
+
+
+    suppliers.push({
+
+        id: newId,
+
+        name: name,
+
+        phone: phone,
+
+        email: email
+
+    });
+
+
+    displaySuppliers();
+
+    updateDashboard();
+
+    alert("Supplier added successfully!");
+
+}
+
+
+/* ================================
+   TRANSACTIONS
+================================ */
+
+function displayTransactions() {
+
+    let table =
+        document.getElementById("transactionTable");
+
+    table.innerHTML = "";
+
+
+    transactions.forEach(transaction => {
+
+        table.innerHTML += `
+
+            <tr>
+
+                <td>${transaction.id}</td>
+
+                <td>${transaction.product}</td>
+
+                <td>${transaction.type}</td>
+
+                <td>${transaction.quantity}</td>
+
+                <td>${transaction.date}</td>
+
+            </tr>
+
+        `;
+
+    });
+
+}
+
+
+/* ================================
+   ADD TRANSACTION
+================================ */
+
+function addTransaction() {
+
+    if (products.length === 0) {
+
+        alert("Please add a product first.");
+
+        return;
+
+    }
+
+
+    let product =
+        prompt(
+            "Enter product name:\n\n" +
+            products
+                .map(p => p.name)
+                .join(", ")
+        );
+
+
+    if (!product) return;
+
+
+    let type =
+        prompt(
+            "Enter transaction type:\n\n" +
+            "STOCK IN or STOCK OUT"
+        );
+
+
+    if (!type) return;
+
+
+    type = type.toUpperCase();
+
+
+    if (
+        type !== "STOCK IN" &&
+        type !== "STOCK OUT"
+    ) {
+
+        alert(
+            "Please enter STOCK IN or STOCK OUT."
+        );
+
+        return;
+
+    }
+
+
+    let quantity =
+        Number(
+            prompt("Enter quantity:")
+        );
+
+
+    if (!quantity || quantity <= 0) {
+
+        alert("Enter a valid quantity.");
+
+        return;
+
+    }
+
+
+    let date =
+        new Date().toLocaleDateString("en-IN");
+
+
+    let newId =
+        transactions.length > 0
+            ? Math.max(...transactions.map(t => t.id)) + 1
+            : 1;
+
+
+    transactions.push({
+
+        id: newId,
+
+        product: product,
+
+        type: type,
+
+        quantity: quantity,
+
+        date: date
+
+    });
+
+
+    let selectedProduct =
+        products.find(
+            p =>
+                p.name.toLowerCase() ===
+                product.toLowerCase()
+        );
+
+
+    if (selectedProduct) {
+
+        if (type === "STOCK IN") {
+
+            selectedProduct.stock += quantity;
+
+        }
+
+        else {
+
+            selectedProduct.stock =
+                Math.max(
+                    0,
+                    selectedProduct.stock - quantity
+                );
+
+        }
+
+    }
+
+
+    saveData();
+
+    displayProducts();
+
+    displayTransactions();
+
+    alert("Transaction added successfully!");
+
+}
+
+
+/* ================================
+   REPORTS
+================================ */
+
+function displayReports() {
+
+    let totalStock =
+        products.reduce(
+            (sum, product) =>
+                sum + product.stock,
+            0
+        );
+
+
+    let lowStock =
+        products.filter(
+            product =>
+                product.stock <= product.reorder
+        ).length;
+
+
+    let totalValue =
+        products.reduce(
+            (sum, product) =>
+                sum +
+                (product.price * product.stock),
+            0
+        );
+
+
+    document.getElementById("reportProducts").textContent =
+        products.length;
+
+
+    document.getElementById("reportStock").textContent =
+        totalStock;
+
+
+    document.getElementById("reportLowStock").textContent =
+        lowStock;
+
+
+    document.getElementById("reportValue").textContent =
+        "₹" + totalValue.toLocaleString();
+
+
+    document.getElementById("reportCategories").textContent =
+        categories.length;
+
+
+    document.getElementById("reportSuppliers").textContent =
+        suppliers.length;
+
+}
+
+
+/* ================================
+   DATE
+================================ */
+
+function showDate() {
+
+    let date =
+        new Date().toLocaleDateString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "long",
+                year: "numeric"
+            }
+        );
+
+
+    document.getElementById("currentDate").textContent =
+        date;
+
+}
+
+
+/* ================================
+   INITIAL LOAD
+================================ */
+
+showDate();
+
+displayProducts();
+
+displayCategories();
+
+displaySuppliers();
+
+displayTransactions();
+
+displayReports();
+
+</script>
+
+</body>
+</html>
